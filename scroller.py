@@ -223,10 +223,7 @@ class HealthBar:
 		self.screen.fill(self.foreground)
 		
 		self.screen.set_clip(None)
-		self.screen.blit(mytext, [self.rect.x, self.rect.y])
-		
-
-	
+		self.screen.blit(mytext, [self.rect.x - mytext.get_width() , self.rect.y])
 
 def adjust_viewport(scene, viewport, player):
 	buffer = 60
@@ -247,17 +244,21 @@ def adjust_viewport(scene, viewport, player):
 
 	viewport = viewport.clamp(scene)
 
-	print(f"{scene} {player} {oldviewport} {viewport}")
+	#print(f"{scene} {player} {oldviewport} {viewport}")
 
 	return viewport
-
+	
 def main():
 	""" Main Program """
 
 	# Call this function so the Pygame library can initialize itself
 	pygame.init()
-	myfont = pygame.font.SysFont('Helvetica', 20)
-
+	
+	
+	healthbarfont = pygame.font.Font('Typodermic - JoystixMonospace-Regular.ttf', 16)
+	turnchoosefont = pygame.font.Font('Typodermic - JoystixMonospace-Regular.ttf', 12)
+	
+	
 	# Create an 800x600 sized screen
 	screen = pygame.display.set_mode([860, 560])
 	viewport = pygame.Rect([100,100,400,300])
@@ -280,19 +281,22 @@ def main():
 
 	room = Room3()
 	rooms.append(room)
-
+   
 	current_room_no = 0
 	current_room = rooms[current_room_no]
 
+		#
 	clock = pygame.time.Clock()
 
 	done = False
 
-	p1_bar = HealthBar(screen, myfont, pygame.Rect(40, 390, 80, 20), "Jim", 200, BLUE, GREEN)
-	p2_bar = HealthBar(screen, myfont, pygame.Rect(40, 420, 160, 60), "Bob", 200, RED, PURPLE)
+	p1_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 430, 80, 20), "Jim", 200, RED, GREEN)
+	p2_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 455, 80, 20), "Archibald", 200, RED, GREEN)
 	
 	MODE_RUNNING = 1
 	MODE_COMBAT = 2
+	
+	selected = 1
 	
 	game_mode = MODE_RUNNING
 
@@ -321,6 +325,7 @@ def main():
 						p2_bar.reset_health()
 					else:
 						game_mode = MODE_RUNNING
+				
 
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT:
@@ -387,16 +392,26 @@ def main():
 		# Detail panel
 		screen.set_clip(pygame.Rect(20, 340, 820, 200))
 		screen.fill(WHITE)
+		
+		# Detail panel seperation
+		screen.set_clip(pygame.Rect(20, 414, 820, 2))
+		screen.fill(BLACK)
+		
+		screen.set_clip(pygame.Rect(319, 415, 2, 200))
+		screen.fill(BLACK)
+		
+		screen.set_clip(pygame.Rect(429, 340, 2, 200))
+		screen.fill(BLACK)		
 
 		if game_mode == MODE_COMBAT:
 			
 			# Draw a sample bar
-			screen.set_clip(pygame.Rect(40, 360, 80, 20))
-			screen.fill(RED)
+			#screen.set_clip(pygame.Rect(40, 360, 80, 20))
+			#screen.fill(RED)
 
-			health = max(0, 80 - (pygame.time.get_ticks() / 2000.0))
-			screen.set_clip(pygame.Rect(40, 360, health, 20))
-			screen.fill(GREEN)
+			#health = max(0, 80 - (pygame.time.get_ticks() / 2000.0))
+			#screen.set_clip(pygame.Rect(40, 360, health, 20))
+			#screen.fill(GREEN)
 			
 			# Draw a new bar
 			p1_bar.take_health(0.2)
@@ -407,8 +422,29 @@ def main():
 
 			screen.set_clip(None)
 			# Draw some text
-			mytext = myfont.render("Some text", False, BLUE)
-			screen.blit(mytext, [440, 20])
+			mytext = turnchoosefont.render("Weapon", False, BLUE)
+			screen.blit(mytext, [325, 415])
+			
+			mytext = turnchoosefont.render("Shield", False, BLUE)
+			screen.blit(mytext, [325, 430])
+			
+			mytext = turnchoosefont.render("Misc Items", False, BLUE)
+			screen.blit(mytext, [325, 445])
+			
+			mytext = turnchoosefont.render("Cast Spell", False, BLUE)
+			screen.blit(mytext, [325, 460])
+			
+			mytext = turnchoosefont.render("Attack", False, BLUE)
+			screen.blit(mytext, [325, 475])
+			
+			mytext = turnchoosefont.render("Diplomacy", False, BLUE)
+			screen.blit(mytext, [325, 490])
+			
+			mytext = turnchoosefont.render("Run!", False, BLUE)
+			screen.blit(mytext, [325, 505])
+			
+			mytext = turnchoosefont.render("React", False, BLUE)
+			screen.blit(mytext, [325, 520])
 			
 		# Draw
 		pygame.display.flip()

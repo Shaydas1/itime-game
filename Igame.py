@@ -1,12 +1,3 @@
-
-
-#This came from http://programarcadegames.com/index.php?lang=en
-
-
-
-
-
-
 """
 Sample Python/Pygame Programs
 Simpson College Computer Science
@@ -29,14 +20,14 @@ http://programarcadegames.com/python_examples/sprite_sheets/
 import pygame
 import random
 
-BLACK  = (	 0,	  0,   0)
+BLACK  = (   0,   0,   0)
 WHITE  = ( 255, 255, 255)
-BLUE   = (	 0,	  0, 255)
-GREEN  = (	 0, 255,   0)
-RED	   = ( 255,	  0,   0)
-PURPLE = ( 255,	  0, 255)
-LIGHT_GREY = (60, 60, 60)
-DARK_GREY = (180, 180, 180)
+BLUE   = (   0,   0, 255)
+GREEN  = (   0, 255,   0)
+RED    = ( 255,   0,   0)
+PURPLE = ( 255,   0, 255)
+LIGHT_GRAY = (60, 60, 60)
+
 
 class Wall(pygame.sprite.Sprite):
 	"""This class represents the bar at the bottom that the player controls """
@@ -126,7 +117,7 @@ class Mob(pygame.sprite.Sprite):
 				self.rect.bottom = block.rect.top
 			else:
 				self.rect.top = block.rect.bottom
-		
+			
 class Player(pygame.sprite.Sprite):
 	""" This class represents the bar at the bottom that the player controls """
 
@@ -193,6 +184,7 @@ class Player(pygame.sprite.Sprite):
 				
 		return special_block
 
+
 class Room(object):
 	""" Base class for all rooms. """
 
@@ -212,49 +204,36 @@ class Room1(Room):
 		# Make the walls. (x_pos, y_pos, width, height)
 
 		# This is a list of walls. Each is in the form [x, y, width, height]
-		self.walls = [[0, 0, 20, 350, DARK_GREY],
-				 [35, 0, 20, 765, DARK_GREY],
-				 [0, 450, 20, 350, DARK_GREY],
-				 [1380, 0, 20, 350, DARK_GREY],
-				 [1380, 450, 20, 350, DARK_GREY],
-				 [20, 0, 1360, 20, DARK_GREY],
-				 [20, 780, 1360, 20, DARK_GREY],
-				 [390, 50, 20, 500, DARK_GREY]
+		walls = [[0, 0, 20, 250, WHITE],
+				 [0, 350, 20, 250, WHITE],
+				 [780, 0, 20, 250, WHITE],
+				 [780, 350, 20, 250, WHITE],
+				 [20, 0, 760, 20, WHITE],
+				 [20, 580, 760, 20, WHITE],
+				 [390, 50, 20, 500, BLUE]
 				]
 
-	   # Loop through the list. Create the wall, add it to the list
-		for item in self.walls:
+		# Loop through the list. Create the wall, add it to the list
+		for item in walls:
 			wall = Wall(item[0], item[1], item[2], item[3], item[4])
 			self.wall_list.add(wall)
-			
+
 		teleport = TeleportWall(250, 250, 15, 15, BLUE, 2)
 		self.wall_list.add(teleport)
-		
-	def rebuild(self, scale):
-		self.wall_list.empty()
-		
-		for item in self.walls:
-			scaled_item = [ val * scale for val in item[0:4] ]
-			wall = Wall(scaled_item[0], scaled_item[1], scaled_item[2], scaled_item[3], item[4])
-			self.wall_list.add(wall)
-
-		teleport = TeleportWall(250 * scale, 250 * scale, 15 * scale, 15 * scale, BLUE, 2)
-		self.wall_list.add(teleport)
-		
 
 class Room2(Room):
 	"""This creates all the walls in room 2"""
 	def __init__(self):
 		Room.__init__(self)
 
-		walls = [[0, 0, 20, 250, DARK_GREY],
-				 [0, 350, 20, 250, DARK_GREY],
-				 [780, 0, 20, 250, DARK_GREY],
-				 [780, 350, 20, 250, DARK_GREY],
-				 [20, 0, 760, 20, DARK_GREY],
-				 [20, 580, 760, 20, DARK_GREY],
-				 [190, 50, 20, 500, DARK_GREY],
-				 [590, 50, 20, 500, DARK_GREY]
+		walls = [[0, 0, 20, 250, RED],
+				 [0, 350, 20, 250, RED],
+				 [780, 0, 20, 250, RED],
+				 [780, 350, 20, 250, RED],
+				 [20, 0, 760, 20, RED],
+				 [20, 580, 760, 20, RED],
+				 [190, 50, 20, 500, GREEN],
+				 [590, 50, 20, 500, GREEN]
 				]
 
 		for item in walls:
@@ -269,12 +248,12 @@ class Room3(Room):
 	def __init__(self):
 		Room.__init__(self)
 
-		walls = [[0, 0, 20, 250, DARK_GREY],
-				 [0, 350, 20, 250, DARK_GREY],
-				 [780, 0, 20, 250, DARK_GREY],
-				 [780, 350, 20, 250, DARK_GREY],
-				 [20, 0, 760, 20, DARK_GREY],
-				 [20, 580, 760, 20, DARK_GREY]
+		walls = [[0, 0, 20, 250, PURPLE],
+				 [0, 350, 20, 250, PURPLE],
+				 [780, 0, 20, 250, PURPLE],
+				 [780, 350, 20, 250, PURPLE],
+				 [20, 0, 760, 20, PURPLE],
+				 [20, 580, 760, 20, PURPLE]
 				]
 
 		for item in walls:
@@ -283,21 +262,93 @@ class Room3(Room):
 
 		for x in range(100, 800, 100):
 			for y in range(50, 451, 300):
-				wall = Wall(x, y, 20, 200, DARK_GREY)
+				wall = Wall(x, y, 20, 200, RED)
 				self.wall_list.add(wall)
 
 		for x in range(150, 700, 100):
-			wall = Wall(x, 200, 20, 200, DARK_GREY)
+			wall = Wall(x, 200, 20, 200, WHITE)
 			self.wall_list.add(wall)
+			
+class HealthBar:
+	def __init__(self, screen, font, rect, name, max_health, background, foreground):
+		self.screen = screen
+		self.font = font
+		self.rect = rect
+		self.name = name
+		self.background = background
+		self.foreground = foreground
+		self.max_health = max_health
+		self.current_health = max_health
+		
+	def set_health(self, new_health):
+		self.current_health = new_health
+		if new_health < 0:
+			self.current_health = 0
+		elif new_health > self.max_health:
+			self.current_health = self.max_health
+		else:
+			self.current_health = new_health
+			
+	def reset_health(self):
+		self.current_health = self.max_health
+		
+	def take_health(self, lost_health):
+		self.set_health(self.current_health - lost_health)
+		
+	def draw(self):
+		mytext = self.font.render(self.name, False, BLUE)
 
+		self.screen.set_clip(self.rect)
+		self.screen.fill(self.background)
+
+		health_percent = self.current_health / self.max_health
+		bar_width = health_percent * self.rect.width
+		
+		health_bar = self.rect.copy()
+		health_bar.width = bar_width
+		self.screen.set_clip(health_bar)
+		self.screen.fill(self.foreground)
+		
+		self.screen.set_clip(None)
+		self.screen.blit(mytext, [self.rect.x - mytext.get_width() , self.rect.y])
+
+def adjust_viewport(scene, viewport, player):
+	buffer = 60
+	# The scene has swidth x sheight
+	# The viewport has vwidth x vheight
+	# The viewport should shift when the player comes within buffer of the viewport edge
+	oldviewport = viewport.copy()
+
+	if (player.x - buffer) < viewport.x:
+		viewport.x = player.x - buffer
+	elif (player.x + buffer) > (viewport.x + viewport.width):
+		viewport.x = player.x + buffer - viewport.width
+
+	if (player.y - buffer) < viewport.y:
+		viewport.y = player.y - buffer
+	elif (player.y + buffer) > (viewport.y + viewport.height):
+		viewport.y = player.y + buffer - viewport.height
+
+	viewport = viewport.clamp(scene)
+
+	#print(f"{scene} {player} {oldviewport} {viewport}")
+
+	return viewport
+	
 def main():
 	""" Main Program """
 
 	# Call this function so the Pygame library can initialize itself
 	pygame.init()
-
+	
+	
+	healthbarfont = pygame.font.Font('Typodermic - JoystixMonospace-Regular.ttf', 16)
+	turnchoosefont = pygame.font.Font('Typodermic - JoystixMonospace-Regular.ttf', 12)
+	
+	
 	# Create an 800x600 sized screen
-	screen = pygame.display.set_mode([1400, 800])
+	screen = pygame.display.set_mode([860, 560])
+	viewport = pygame.Rect([100,100,400,300])
 
 	# Set the title of the window
 	pygame.display.set_caption('Maze Runner')
@@ -320,13 +371,24 @@ def main():
 
 	room = Room3()
 	rooms.append(room)
-
+   
 	current_room_no = 0
 	current_room = rooms[current_room_no]
 
+		#
 	clock = pygame.time.Clock()
 
 	done = False
+
+	p1_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 430, 80, 20), "Jim", 200, RED, GREEN)
+	p2_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 455, 80, 20), "Archibald", 200, RED, GREEN)
+	
+	MODE_RUNNING = 1
+	MODE_COMBAT = 2
+	
+	selected = 1
+	
+	game_mode = MODE_RUNNING
 
 	while not done:
 
@@ -345,6 +407,15 @@ def main():
 					player.changespeed(0, -5)
 				if event.key == pygame.K_DOWN:
 					player.changespeed(0, 5)
+				if event.key == pygame.K_ESCAPE:
+					done = True
+				if event.key == pygame.K_SPACE:
+					if game_mode == MODE_RUNNING:
+						game_mode = MODE_COMBAT
+						p2_bar.reset_health()
+					else:
+						game_mode = MODE_RUNNING
+				
 
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT:
@@ -358,29 +429,31 @@ def main():
 
 		# --- Game Logic ---
 
-		collision = player.move(current_room.wall_list)
-		if type(collision) is TeleportWall:
-			current_room_no = collision.new_room
-			current_room = rooms[current_room_no]
-			
-		mob.move(current_room.wall_list, player.rect.x, player.rect.y, pygame.time.get_ticks() / 10000.0)
+		if game_mode == MODE_RUNNING:
+			# Change if wanting mobs to move during combat
+			collision = player.move(current_room.wall_list)
+			if type(collision) is TeleportWall:
+				current_room_no = collision.new_room
+				current_room = rooms[current_room_no]
+				
+			mob.move(current_room.wall_list, player.rect.x, player.rect.y, pygame.time.get_ticks() / 10000.0)
+
 
 		if player.rect.x < -15:
 			if current_room_no == 0:
 				current_room_no = 2
 				current_room = rooms[current_room_no]
-				player.rect.x = 1390
+				player.rect.x = 790
 			elif current_room_no == 2:
 				current_room_no = 1
 				current_room = rooms[current_room_no]
-				player.rect.x = 1390
+				player.rect.x = 790
 			else:
 				current_room_no = 0
 				current_room = rooms[current_room_no]
-				current_room.rebuild(0.5)				
 				player.rect.x = 790
 
-		if player.rect.x > 1401:
+		if player.rect.x > 801:
 			if current_room_no == 0:
 				current_room_no = 1
 				current_room = rooms[current_room_no]
@@ -395,11 +468,82 @@ def main():
 				player.rect.x = 0
 
 		# --- Drawing ---
-		screen.fill(LIGHT_GREY)
+		screen.fill(BLACK)
 
-		movingsprites.draw(screen)
-		current_room.wall_list.draw(screen)
+		level = pygame.Surface([800,600])
+		level.fill(LIGHT_GRAY)
 
+		movingsprites.draw(level)
+		current_room.wall_list.draw(level)
+
+		screen.set_clip(None)
+		
+		# Level Overview
+		screen.blit(pygame.transform.scale(level, [400,300]), [20, 20])
+
+		# Close-up view
+		screen.set_clip(pygame.Rect(440,20,400,300))
+		viewport = adjust_viewport(level.get_rect(), viewport, player.rect)
+		screen.blit(level, [440, 20], viewport)
+
+		# Detail panel
+		screen.set_clip(pygame.Rect(20, 340, 820, 200))
+		screen.fill(WHITE)
+		
+		# Detail panel seperation
+		screen.set_clip(pygame.Rect(20, 414, 820, 2))
+		screen.fill(BLACK)
+		
+		screen.set_clip(pygame.Rect(319, 415, 2, 200))
+		screen.fill(BLACK)
+		
+		screen.set_clip(pygame.Rect(429, 340, 2, 200))
+		screen.fill(BLACK)		
+
+		if game_mode == MODE_COMBAT:
+			
+			# Draw a sample bar
+			#screen.set_clip(pygame.Rect(40, 360, 80, 20))
+			#screen.fill(RED)
+
+			#health = max(0, 80 - (pygame.time.get_ticks() / 2000.0))
+			#screen.set_clip(pygame.Rect(40, 360, health, 20))
+			#screen.fill(GREEN)
+			
+			# Draw a new bar
+			p1_bar.take_health(0.2)
+			p1_bar.draw()
+
+			p2_bar.take_health(0.3)
+			p2_bar.draw()
+
+			screen.set_clip(None)
+			# Draw some text
+			mytext = turnchoosefont.render("Weapon", False, BLUE)
+			screen.blit(mytext, [325, 415])
+			
+			mytext = turnchoosefont.render("Shield", False, BLUE)
+			screen.blit(mytext, [325, 430])
+			
+			mytext = turnchoosefont.render("Misc Items", False, BLUE)
+			screen.blit(mytext, [325, 445])
+			
+			mytext = turnchoosefont.render("Cast Spell", False, BLUE)
+			screen.blit(mytext, [325, 460])
+			
+			mytext = turnchoosefont.render("Attack", False, BLUE)
+			screen.blit(mytext, [325, 475])
+			
+			mytext = turnchoosefont.render("Diplomacy", False, BLUE)
+			screen.blit(mytext, [325, 490])
+			
+			mytext = turnchoosefont.render("Run!", False, BLUE)
+			screen.blit(mytext, [325, 505])
+			
+			mytext = turnchoosefont.render("React", False, BLUE)
+			screen.blit(mytext, [325, 520])
+			
+		# Draw
 		pygame.display.flip()
 
 		clock.tick(60)

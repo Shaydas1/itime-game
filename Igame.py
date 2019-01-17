@@ -19,6 +19,7 @@ http://programarcadegames.com/python_examples/sprite_sheets/
 """
 import pygame
 import random
+from combatEngine import do_combat
 
 BLACK  = (   0,   0,   0)
 WHITE  = ( 255, 255, 255)
@@ -56,18 +57,72 @@ class TeleportWall(Wall):
 	def teleport(self):
 		print("Teleporting!")
 
-class Mob(pygame.sprite.Sprite):
-	
-	def __init__(self, x, y):
+class Character(pygame.sprite.Sprite):
+	def __init__(self, x, y, color, name, health, level, max_damage, defence, shield, attack_time, defensive_mode):
 	
 		super().__init__()
 		
 		self.image = pygame.Surface([15, 15])
-		self.image.fill(RED)
+		self.image.fill(color)
 		
 		self.rect = self.image.get_rect()
 		self.rect.y = y
 		self.rect.x = x
+		
+		self.name = name
+		self.health = health
+		self.level = level
+		self.max_damage = max_damage
+		self.defence = defence
+		self.shield = shield		
+		self.defensive_mode = defensive_mode
+		
+		self.attack_time = attack_time
+		self.next_attack = 0
+		
+	def move(self, walls, dx, dy):
+		""" Find a new position for the player """
+		# Move left/right
+		self.rect.x += dx
+
+		special_block = None
+		
+		# Did this update cause us to hit a wall?
+		block_hit_list = pygame.sprite.spritecollide(self, walls, False)
+		for block in block_hit_list:
+			if type(block) is TeleportWall:
+				special_block = block
+		
+			# If we are moving right, set our right side to the left side of
+			# the item we hit
+			if dx > 0:
+				self.rect.right = block.rect.left
+			else:
+				# Otherwise if we are moving left, do the opposite.
+				self.rect.left = block.rect.right
+
+		# Move up/down
+		self.rect.y += dy
+
+		# Check and see if we hit anything
+		block_hit_list = pygame.sprite.spritecollide(self, walls, False)
+		for block in block_hit_list:
+			if type(block) is TeleportWall:
+				special_block = block
+		
+			# Reset our position based on the top/bottom of the object.
+			if dy > 0:
+				self.rect.bottom = block.rect.top
+			else:
+				self.rect.top = block.rect.bottom
+				
+		return special_block
+			
+
+class Mob(Character):
+	
+	def __init__(self, x, y, name, health, level, max_damage, defence, shield):
+		super().__init__(x, y, RED, name, health, level, max_damage, defence, shield, 1000, "block")
 		
 	def move(self, walls, player_x, player_y, max_distr):
 		""" Find a new position for the player """
@@ -89,57 +144,24 @@ class Mob(pygame.sprite.Sprite):
 		elif dist_y < -max_distr:
 			dist_y = -max_distr
 			
-		self.change_x = dist_x + random.randint(-5,5)
-		self.change_y = dist_y + random.randint(-5,5)
+		dx = dist_x + random.randint(-5,5)
+		dy = dist_y + random.randint(-5,5)
 		
-		# Move left/right
-		self.rect.x += self.change_x
-		
-		# Did this update cause us to hit a wall?
-		block_hit_list = pygame.sprite.spritecollide(self, walls, False)
-		for block in block_hit_list:
-			# If we are moving right, set our right side to the left side of
-			# the item we hit
-			if self.change_x > 0:
-				self.rect.right = block.rect.left
-			else:
-				# Otherwise if we are moving left, do the opposite.
-				self.rect.left = block.rect.right
-
-		# Move up/down
-		self.rect.y += self.change_y
-
-		# Check and see if we hit anything
-		block_hit_list = pygame.sprite.spritecollide(self, walls, False)
-		for block in block_hit_list:
-			# Reset our position based on the top/bottom of the object.
-			if self.change_y > 0:
-				self.rect.bottom = block.rect.top
-			else:
-				self.rect.top = block.rect.bottom
+		super().move(walls, dx, dy)
 			
-class Player(pygame.sprite.Sprite):
+class Player(Character):
 	""" This class represents the bar at the bottom that the player controls """
 
 	# Set speed vector
 	change_x = 0
 	change_y = 0
 
-	def __init__(self, x, y):
+	def __init__(self, x, y, name, health, level, max_damage, defence, shield):
 		""" Constructor function """
 
 		# Call the parent's constructor
-		super().__init__()
-
-		# Set height, width
-		self.image = pygame.Surface([15, 15])
-		self.image.fill(WHITE)
-
-		# Make our top-left corner the passed-in location.
-		self.rect = self.image.get_rect()
-		self.rect.y = y
-		self.rect.x = x
-
+		super().__init__(x, y, WHITE, name, health, level, max_damage, defence, shield, 500, "parry")
+		
 	def changespeed(self, x, y):
 		""" Change the speed of the player. Called with a keypress. """
 		self.change_x += x
@@ -147,42 +169,9 @@ class Player(pygame.sprite.Sprite):
 
 	def move(self, walls):
 		""" Find a new position for the player """
-
-		# Move left/right
-		self.rect.x += self.change_x
-
-		special_block = None
+		teleportblock = super().move(walls, self.change_x, self.change_y)
 		
-		# Did this update cause us to hit a wall?
-		block_hit_list = pygame.sprite.spritecollide(self, walls, False)
-		for block in block_hit_list:
-			if type(block) is TeleportWall:
-				special_block = block
-
-			# If we are moving right, set our right side to the left side of
-			# the item we hit
-			if self.change_x > 0:
-				self.rect.right = block.rect.left
-			else:
-				# Otherwise if we are moving left, do the opposite.
-				self.rect.left = block.rect.right
-
-		# Move up/down
-		self.rect.y += self.change_y
-
-		# Check and see if we hit anything
-		block_hit_list = pygame.sprite.spritecollide(self, walls, False)
-		for block in block_hit_list:
-			if type(block) is TeleportWall:
-				special_block = block
-			
-			# Reset our position based on the top/bottom of the object.
-			if self.change_y > 0:
-				self.rect.bottom = block.rect.top
-			else:
-				self.rect.top = block.rect.bottom
-				
-		return special_block
+		return teleportblock
 
 
 class Room(object):
@@ -354,11 +343,14 @@ def main():
 	pygame.display.set_caption('Maze Runner')
 
 	# Create the player paddle object
-	player = Player(50, 50)
+	level = 55
+	#player = Player(50, 50, "Fred", 100 + level * 20, level, 20 + 5 * level, 5 + 1 * level, 0.2)
+	player = Player(50, 50, "Fred", 2000, 1, 20, 10, .3)
 	movingsprites = pygame.sprite.Group()
 	movingsprites.add(player)
 
-	mob = Mob(50, 70)
+	#mob = Mob(50, 70, f"Orc1", 600, 1, 70, 10 * 5, 0.4)
+	mob = Mob(50, 70, f"Orc1", 600, 1, 20, 10, 0.4)
 	movingsprites.add(mob)
 	
 	rooms = []
@@ -380,8 +372,8 @@ def main():
 
 	done = False
 
-	p1_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 430, 80, 20), "Jim", 200, RED, GREEN)
-	p2_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 455, 80, 20), "Archibald", 200, RED, GREEN)
+	p1_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 430, 80, 20), f"{player.name}", player.health, RED, GREEN)
+	p2_bar = HealthBar(screen, healthbarfont, pygame.Rect(220, 455, 80, 20), f"{mob.name}", mob.health, RED, GREEN)
 	
 	MODE_RUNNING = 1
 	MODE_COMBAT = 2
@@ -467,6 +459,25 @@ def main():
 				current_room = rooms[current_room_no]
 				player.rect.x = 0
 
+		# --- Combat ---
+		#print(f"{pygame.time.get_ticks()} {player.next_attack} {mob.next_attack}")
+		if player.health > 0 and mob.health > 0 and pygame.time.get_ticks() > player.next_attack:
+			do_combat(player, mob)
+			player.next_attack = pygame.time.get_ticks() + player.attack_time
+			if player.health <= 0:
+				movingsprites.remove(player)
+			if mob.health <= 0:
+				movingsprites.remove(mob)
+
+		if player.health > 0 and mob.health > 0 and pygame.time.get_ticks() > mob.next_attack:
+			do_combat(mob,player)
+			mob.next_attack = pygame.time.get_ticks() + mob.attack_time
+			if player.health <= 0:
+				movingsprites.remove(player)
+			if mob.health <= 0:
+				movingsprites.remove(mob)
+				
+				
 		# --- Drawing ---
 		screen.fill(BLACK)
 
